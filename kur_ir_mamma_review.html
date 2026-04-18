@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kur ir mamma? — Pārskats</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f2f0ec;
+      color: #1a1a1a;
+      padding: 32px 16px 80px;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 36px;
+      text-align: center;
+    }
+    header h1 { font-size: 26px; font-weight: 700; margin-bottom: 5px; }
+    header p { font-size: 14px; color: #888; }
+
+    /* ── Cover ── */
+    .cover-wrap {
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+    .cover-wrap img {
+      width: 100%; border-radius: 14px; display: block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .cover-label {
+      text-align: center; font-size: 11px; color: #aaa;
+      text-transform: uppercase; letter-spacing: 1.2px; margin-top: 8px;
+    }
+
+    /* ── Slide card ── */
+    .slide {
+      max-width: 1100px;
+      margin: 0 auto 44px;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+    }
+
+    /* Top row: image + comment panel */
+    .slide-top {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .slide-image-wrap {
+      flex: 0 0 62%;
+      max-width: 62%;
+    }
+    .slide-image-wrap img {
+      width: 100%; display: block;
+      aspect-ratio: 4/3; object-fit: cover;
+      background: #e5e2db;
+    }
+
+    /* Comment panel */
+    .comment-panel {
+      flex: 1;
+      padding: 18px 18px 18px 16px;
+      border-left: 1px solid #f0ede7;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #faf9f7;
+    }
+    .comment-panel h3 {
+      font-size: 11px; font-weight: 600; color: #999;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .comment-group { display: flex; flex-direction: column; gap: 5px; }
+    .comment-group label {
+      font-size: 12px; font-weight: 500; color: #666;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .comment-group label span { font-size: 14px; }
+    .comment-group textarea {
+      width: 100%;
+      min-height: 68px;
+      border: 1.5px solid #e5e2db;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #222;
+      resize: vertical;
+      background: #fff;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .comment-group textarea:focus {
+      outline: none;
+      border-color: #a8a0d0;
+    }
+    .comment-group textarea::placeholder { color: #ccc; }
+    .save-btn {
+      margin-top: auto;
+      padding-top: 10px;
+    }
+    .save-btn button {
+      width: 100%;
+      padding: 9px 14px;
+      background: #5c55a0;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .save-btn button:hover { background: #4a4490; }
+    .save-btn button.saved {
+      background: #3a9e6a;
+    }
+
+    /* Bottom row: narration */
+    .slide-body {
+      padding: 16px 22px 20px;
+      border-top: 1px solid #f0ede7;
+    }
+    .slide-number {
+      font-size: 11px; font-weight: 600; color: #bbb;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      margin-bottom: 8px;
+    }
+    .slide-text {
+      font-size: 16.5px; line-height: 1.68; color: #222;
+    }
+    .slide-text .dialog { color: #444; font-style: italic; }
+    .poem-block {
+      display: block; line-height: 2.1;
+      padding: 8px 14px; margin: 10px 0;
+      border-left: 3px solid #d9d5c8;
+      font-style: italic; color: #444;
+      background: #faf9f7; border-radius: 0 8px 8px 0;
+    }
+
+    /* ── Export bar ── */
+    .export-bar {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    .export-bar p {
+      flex: 1; font-size: 13.5px; color: #666;
+    }
+    .export-bar button {
+      padding: 9px 20px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .export-bar button:hover { background: #333; }
+
+    /* ── Mobile ── */
+    @media (max-width: 700px) {
+      .slide-top { flex-direction: column; }
+      .slide-image-wrap { flex: none; max-width: 100%; }
+      .comment-panel { border-left: none; border-top: 1px solid #f0ede7; }
+      .slide-text { font-size: 15.5px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Kur ir mamma?</h1>
+  <p>Pārskats autores apstiprināšanai &nbsp;·&nbsp; 29 slaidiem + vāks</p>
+</header>
+
+<!-- Export bar -->
+<div class="export-bar">
+  <p>Aizpildi komentārus katram slaidam un nokopē tos ar pogu →</p>
+  <button onclick="copyAllComments()">📋 Kopēt visas piezīmes</button>
+</div>
+
+<!-- COVER -->
+<div class="cover-wrap">
+  <img src="cover/kur_ir_mamma_cover.png" alt="Vāks">
+  <div class="cover-label">Vāks</div>
+</div>
+
+<!-- SLIDES -->
+
+<div class="slide" id="slide-1">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide01.png" alt="1. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-1" placeholder="Komentārs par attēlu..." oninput="autosave(1)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-1" placeholder="Komentārs par tekstu..." oninput="autosave(1)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-1" onclick="saveSlide(1)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">1. slaids</div>
+    <div class="slide-text">Šodien Martai ir īpaša diena! Visa ģimene brauks uz tirdzniecības centru. Parasti Marta paliek pie vecmāmiņas, bet šoreiz viņa brauc līdzi!</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-2">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide02.png" alt="2. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-2" placeholder="Komentārs par attēlu..." oninput="autosave(2)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-2" placeholder="Komentārs par tekstu..." oninput="autosave(2)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-2" onclick="saveSlide(2)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">2. slaids</div>
+    <div class="slide-text">Marta atver skapi un izvēlas savu mīļāko rozā kleitu. Pie kleitas — baltās kurpītes ar mazu papēdi. <span class="dialog">„Es būšu visskaistākā!"</span> saka Marta.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-3">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide03.png" alt="3. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-3" placeholder="Komentārs par attēlu..." oninput="autosave(3)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-3" placeholder="Komentārs par tekstu..." oninput="autosave(3)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-3" onclick="saveSlide(3)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">3. slaids</div>
+    <div class="slide-text"><span class="dialog">„Mammu, sapīsi man bizītes?"</span> prasa Marta. Mamma uzmanīgi ķemmē Martas matus un iesien divas rozā lentītes. <span class="dialog">„Viss, esmu gatava!"</span> priecājas Marta.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-4">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide04.png" alt="4. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-4" placeholder="Komentārs par attēlu..." oninput="autosave(4)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-4" placeholder="Komentārs par tekstu..." oninput="autosave(4)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-4" onclick="saveSlide(4)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">4. slaids</div>
+    <div class="slide-text">Marta grib iet pie durvīm, bet pēkšņi — <span class="dialog">„Mammu, man gribas dzert!"</span> Mamma iedod viņai glāzi ūdens. Laiks rit, bet Martai vēl kaut ko gribas.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-5">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide05.png" alt="5. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-5" placeholder="Komentārs par attēlu..." oninput="autosave(5)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-5" placeholder="Komentārs par tekstu..." oninput="autosave(5)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-5" onclick="saveSlide(5)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">5. slaids</div>
+    <div class="slide-text">Marta paskatās uz kājām — <span class="dialog">„Vai! Manas zeķes ir netīras!"</span> Uz baltajām zeķēm ir zilas svītras. Kā tas notika? Neviens nezina. Jāvelk citas zeķes!</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-6">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide06.png" alt="6. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-6" placeholder="Komentārs par attēlu..." oninput="autosave(6)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-6" placeholder="Komentārs par tekstu..." oninput="autosave(6)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-6" onclick="saveSlide(6)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">6. slaids</div>
+    <div class="slide-text"><span class="dialog">„Kur ir mans Taksiņš? Es bez viņa nevaru braukt!"</span> Marta meklē zem gultas, aiz dīvāna un skapī. Beidzot — re, kur viņš ir! Tas guļ zem spilvena.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-7">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide07.png" alt="7. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-7" placeholder="Komentārs par attēlu..." oninput="autosave(7)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-7" placeholder="Komentārs par tekstu..." oninput="autosave(7)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-7" onclick="saveSlide(7)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">7. slaids</div>
+    <div class="slide-text">Pēc visas tās rosīšanās Martai sagribas ēst. <span class="dialog">„Mammu, man tukšs vēderiņš!"</span> Mamma iedod Martai ābolu. <span class="dialog">„Nu beidzot ejam!"</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-8">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide08.png" alt="8. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-8" placeholder="Komentārs par attēlu..." oninput="autosave(8)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-8" placeholder="Komentārs par tekstu..." oninput="autosave(8)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-8" onclick="saveSlide(8)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">8. slaids</div>
+    <div class="slide-text">Marta ar brāli sēž mašīnā. Viņa cieši tur savu Taksiņu. Pa logu ātri pazib mājas, koki un veikali. Drīz jau būsim tirdzniecības centrā!</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-9">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide09.png" alt="9. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-9" placeholder="Komentārs par attēlu..." oninput="autosave(9)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-9" placeholder="Komentārs par tekstu..." oninput="autosave(9)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-9" onclick="saveSlide(9)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">9. slaids</div>
+    <div class="slide-text">Marta ieiet tirdzniecības centrā un apstājas. <span class="dialog">„Cik liels! Cik skaists!"</span> Visur ir veikali, cilvēki un gaismas. Blakus Martai vienmēr lidinās viņas sargeņģelītis Rafs. Pat viņš ir pārsteigts!</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-10">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide10.png" alt="10. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-10" placeholder="Komentārs par attēlu..." oninput="autosave(10)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-10" placeholder="Komentārs par tekstu..." oninput="autosave(10)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-10" onclick="saveSlide(10)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">10. slaids</div>
+    <div class="slide-text">Pēkšņi — <span class="dialog">„Skat, mamm, rotaļlietas!"</span> Marta ar brāli pieķeras mammas rokai. <span class="dialog">„Mēs tikai paskatīsimies, lūdzu!"</span> Mamma pasmaida un ieiet kopā ar viņiem.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-11">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide11.png" alt="11. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-11" placeholder="Komentārs par attēlu..." oninput="autosave(11)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-11" placeholder="Komentārs par tekstu..." oninput="autosave(11)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-11" onclick="saveSlide(11)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">11. slaids</div>
+    <div class="slide-text"><span class="dialog">„Vai es varu visu šo paņemt sev?"</span> Martai acis spīd. Mājās viņai ir daudz mantiņu, bet tik daudz vienā vietā — nekad! Viņai gribas apkampt visu uzreiz.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-12">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide12.png" alt="12. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-12" placeholder="Komentārs par attēlu..." oninput="autosave(12)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-12" placeholder="Komentārs par tekstu..." oninput="autosave(12)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-12" onclick="saveSlide(12)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">12. slaids</div>
+    <div class="slide-text">Tētis saka: <span class="dialog">„Es tikai aizskriešu līdz makšķernieku veikalam un tūlīt nākšu atpakaļ."</span> Mamma paliek ar bērniem. Tētis aizsteidzas pa eju.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-13">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide13.png" alt="13. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-13" placeholder="Komentārs par attēlu..." oninput="autosave(13)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-13" placeholder="Komentārs par tekstu..." oninput="autosave(13)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-13" onclick="saveSlide(13)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">13. slaids</div>
+    <div class="slide-text">Brālis saka: <span class="dialog">„Es iešu paskatīties konstruktorus. Es pats jūs atradīšu!"</span> Un jau viņš ir prom. Marta paliek ar mammu un Rafu.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-14">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide14.png" alt="14. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-14" placeholder="Komentārs par attēlu..." oninput="autosave(14)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-14" placeholder="Komentārs par tekstu..." oninput="autosave(14)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-14" onclick="saveSlide(14)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">14. slaids</div>
+    <div class="slide-text">Mammai zvana telefons. <span class="dialog">„Martiņ, paliec man tepat blakus, lūdzu! Šis ir svarīgs zvans."</span> Marta piekrīt. Viņa taču ir liela meitene!</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-15">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide15.png" alt="15. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-15" placeholder="Komentārs par attēlu..." oninput="autosave(15)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-15" placeholder="Komentārs par tekstu..." oninput="autosave(15)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-15" onclick="saveSlide(15)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">15. slaids</div>
+    <div class="slide-text">Turpat blakus plauktā ir muzikāls lācītis! Marta pieiet tuvāk. <span class="dialog">„Es tikai paskatīšos."</span> Rafs pieskaras Martas rokai, bet viņa neatskatās.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-16">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide16.png" alt="16. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-16" placeholder="Komentārs par attēlu..." oninput="autosave(16)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-16" placeholder="Komentārs par tekstu..." oninput="autosave(16)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-16" onclick="saveSlide(16)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">16. slaids</div>
+    <div class="slide-text">Vēl viens solītis — un re! Garš plaukts ar lellēm! Skaistas, jautras un dīvainas. Marta iet garām un skatās. <span class="dialog">„Cik tās visas ir dažādas!"</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-17">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide17.png" alt="17. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-17" placeholder="Komentārs par attēlu..." oninput="autosave(17)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-17" placeholder="Komentārs par tekstu..." oninput="autosave(17)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-17" onclick="saveSlide(17)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">17. slaids</div>
+    <div class="slide-text">Tālāk — mīkstie lāči un zaķi. Tad krāsainie zīmuļi un uzlīmes. Tad konstruktori. Marta iet un iet un aizmirst par visu. Rafs čukst: <span class="dialog">„Martiņ, apstājies!"</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-18">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide18.png" alt="18. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-18" placeholder="Komentārs par attēlu..." oninput="autosave(18)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-18" placeholder="Komentārs par tekstu..." oninput="autosave(18)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-18" onclick="saveSlide(18)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">18. slaids</div>
+    <div class="slide-text">Ejas galā ir pufi un televizors ar multenēm! Marta steidzas turp. <span class="dialog">„Cik forši!"</span> Rafs lidinās blakus un sauc: <span class="dialog">„Martiņ, pagaidi!"</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-19">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide19.png" alt="19. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-19" placeholder="Komentārs par attēlu..." oninput="autosave(19)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-19" placeholder="Komentārs par tekstu..." oninput="autosave(19)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-19" onclick="saveSlide(19)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">19. slaids</div>
+    <div class="slide-text">Pēkšņi Marta paskatās apkārt. <span class="dialog">„Kur es esmu? Kur ir mamma?"</span> Viņas sirsniņa sāk pukstēt arvien ātrāk.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-20">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide20.png" alt="20. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-20" placeholder="Komentārs par attēlu..." oninput="autosave(20)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-20" placeholder="Komentārs par tekstu..." oninput="autosave(20)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-20" onclick="saveSlide(20)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">20. slaids</div>
+    <div class="slide-text"><span class="dialog">„Mammu! Mammuuuu!"</span> Marta skrien uz vienu pusi, tad uz otru. Visur ir sveši cilvēki. Neviens neatsaucas. Asaras rit pār vaigiem.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-21">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide21.png" alt="21. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-21" placeholder="Komentārs par attēlu..." oninput="autosave(21)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-21" placeholder="Komentārs par tekstu..." oninput="autosave(21)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-21" onclick="saveSlide(21)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">21. slaids</div>
+    <div class="slide-text">Marta apsēžas un sāk raudāt. Bet pēkšņi — silts apskāviens! Tas ir Rafs, viņas eņģelītis. Viņš klusi čukst: <span class="dialog">„Martiņ, nebaidies. Atrodi pārdevēju un palūdz palīdzību. Es esmu ar tevi."</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-22">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide22.png" alt="22. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-22" placeholder="Komentārs par attēlu..." oninput="autosave(22)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-22" placeholder="Komentārs par tekstu..." oninput="autosave(22)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-22" onclick="saveSlide(22)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">22. slaids</div>
+    <div class="slide-text">Marta paskatās un pamana pārdevēju! Viņa skrien pie viņas un saka: <span class="dialog">„Es pazaudēju mammu!"</span> Pārdevēja maigi pasmaida: <span class="dialog">„Nebaidies. Ejam tavu mammu meklēt kopā."</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-23">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide23.png" alt="23. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-23" placeholder="Komentārs par attēlu..." oninput="autosave(23)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-23" placeholder="Komentārs par tekstu..." oninput="autosave(23)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-23" onclick="saveSlide(23)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">23. slaids</div>
+    <div class="slide-text">Viņas iet kopā uz kasēm. <span class="dialog">„Kā tevi sauc? Kā sauc tavu mammu?"</span> Marta atbild. <span class="dialog">„Vai tu zini mammas telefona numuru?"</span> Marta papurina galvu. Asaras atkal rit pār vaigiem.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-24">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide24.png" alt="24. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-24" placeholder="Komentārs par attēlu..." oninput="autosave(24)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-24" placeholder="Komentārs par tekstu..." oninput="autosave(24)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-24" onclick="saveSlide(24)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">24. slaids</div>
+    <div class="slide-text"><span class="dialog">„Neraudi, saulīt, tagad pasauksim tavu mammu pa skaļruni."</span> Pa visu tirdzniecības centru atskan balss: <span class="dialog">„Marta gaida savu māmiņu pie kasēm!"</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-25">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide25.png" alt="25. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-25" placeholder="Komentārs par attēlu..." oninput="autosave(25)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-25" placeholder="Komentārs par tekstu..." oninput="autosave(25)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-25" onclick="saveSlide(25)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">25. slaids</div>
+    <div class="slide-text">Mamma dzird paziņojumu un skrien, cik ātri vien var! Viņa bija ļoti uztraukusies. <span class="dialog">„Marta! Mana meitiņa!"</span></div>
+  </div>
+</div>
+
+<div class="slide" id="slide-26">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide26.png" alt="26. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-26" placeholder="Komentārs par attēlu..." oninput="autosave(26)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-26" placeholder="Komentārs par tekstu..." oninput="autosave(26)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-26" onclick="saveSlide(26)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">26. slaids</div>
+    <div class="slide-text">Mamma cieši, cieši apkampj Martu. Viņa ilgi nelaiž meiteni vaļā. <span class="dialog">„Es tā satraucos par tevi!"</span> Marta arī cieši turas pie mammas. Tagad viss ir labi.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-27">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide27.png" alt="27. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-27" placeholder="Komentārs par attēlu..." oninput="autosave(27)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-27" placeholder="Komentārs par tekstu..." oninput="autosave(27)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-27" onclick="saveSlide(27)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">27. slaids</div>
+    <div class="slide-text">Tētis un brālis arī atskrien pie kasēm. Visa ģimene atkal ir kopā! Tagad Marta cieši tur mammas roku un ne mirkli to neatlaiž.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-28">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide28.png" alt="28. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-28" placeholder="Komentārs par attēlu..." oninput="autosave(28)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-28" placeholder="Komentārs par tekstu..." oninput="autosave(28)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-28" onclick="saveSlide(28)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">28. slaids</div>
+    <div class="slide-text">Vakarā mamma apsēžas pie Martas gultas. <span class="dialog">„Es tev iemācīšu savu telefona numuru — dzejolītī!"</span> Un mamma saka dzejolīti:<span class="poem-block">„Sākumā divi pie deviņiem iet,<br>tad trīs un seši sāk kamanās skriet.<br>No kalna lejā pieci un viens,<br>bet nulle un deviņi — balti kā piens!"</span>Marta klausās uzmanīgi un atkārto. Tagad viņa vienmēr zinās, kā atrast mammu.</div>
+  </div>
+</div>
+
+<div class="slide" id="slide-29">
+  <div class="slide-top">
+    <div class="slide-image-wrap">
+      <img src="images/kur_ir_mamma_slide29.png" alt="29. slaids">
+    </div>
+    <div class="comment-panel">
+      <h3>Piezīmes</h3>
+      <div class="comment-group">
+        <label><span>🖼️</span> Attēls</label>
+        <textarea id="img-29" placeholder="Komentārs par attēlu..." oninput="autosave(29)"></textarea>
+      </div>
+      <div class="comment-group">
+        <label><span>📝</span> Teksts</label>
+        <textarea id="txt-29" placeholder="Komentārs par tekstu..." oninput="autosave(29)"></textarea>
+      </div>
+      <div class="save-btn"><button id="btn-29" onclick="saveSlide(29)">Saglabāt</button></div>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="slide-number">29. slaids</div>
+    <div class="slide-text">Marta aizmieg laimīga. Rafs klusi čukst: <span class="dialog">„Es vienmēr būšu tev blakus, Martiņ. Pat tad, kad tu mani nedzirdēsi."</span> Šodien Marta iemācījās, ka vienmēr jāpaliek mammai blakus, un, ja gadās apmaldīties, jāmeklē palīdzība pie pārdevējas. Tagad viņa zina arī mammas telefona numuru.</div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 29;
+
+function autosave(n) {
+  const img = document.getElementById('img-' + n).value;
+  const txt = document.getElementById('txt-' + n).value;
+  localStorage.setItem('kim_img_' + n, img);
+  localStorage.setItem('kim_txt_' + n, txt);
+}
+
+function saveSlide(n) {
+  autosave(n);
+  const btn = document.getElementById('btn-' + n);
+  btn.textContent = '✓ Saglabāts';
+  btn.classList.add('saved');
+  setTimeout(() => {
+    btn.textContent = 'Saglabāt';
+    btn.classList.remove('saved');
+  }, 2000);
+}
+
+function loadAll() {
+  for (let n = 1; n <= TOTAL; n++) {
+    const img = localStorage.getItem('kim_img_' + n);
+    const txt = localStorage.getItem('kim_txt_' + n);
+    if (img) document.getElementById('img-' + n).value = img;
+    if (txt) document.getElementById('txt-' + n).value = txt;
+  }
+}
+
+function copyAllComments() {
+  let lines = ['PIEZĪMES — Kur ir mamma?\n'];
+  let hasAny = false;
+  for (let n = 1; n <= TOTAL; n++) {
+    const img = (localStorage.getItem('kim_img_' + n) || '').trim();
+    const txt = (localStorage.getItem('kim_txt_' + n) || '').trim();
+    if (img || txt) {
+      hasAny = true;
+      lines.push('── ' + n + '. slaids ──');
+      if (img) lines.push('🖼️  Attēls: ' + img);
+      if (txt) lines.push('📝 Teksts: ' + txt);
+      lines.push('');
+    }
+  }
+  if (!hasAny) {
+    alert('Nav nevienas piezīmes. Aizpildi komentārus un nospied "Saglabāt"!');
+    return;
+  }
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const btn = document.querySelector('.export-bar button');
+    btn.textContent = '✓ Nokopēts!';
+    setTimeout(() => btn.textContent = '📋 Kopēt visas piezīmes', 2500);
+  });
+}
+
+window.addEventListener('load', loadAll);
+</script>
+
+</body>
+</html>
